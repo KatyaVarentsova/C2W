@@ -54,16 +54,16 @@ const topicsState : ITopicsState = {
     ]
 }
 
-// export const fetchTopics = createAsyncThunk('topicsSlice/fetchTopics', (_, thunkObject) => {
-//     fetch('http://localhost:3001/themes')
-//         .then((result) => {
-//             return result.json()
-//         })
-//         .then((result) => {
-//             const dispatch = thunkObject.dispatch;
-//             dispatch(saveTopics(result.result))
-//         })
-// })
+export const fetchTopics = createAsyncThunk('topicsSlice/fetchTopics', (_, thunkObject) => {
+    fetch('/api/themes')
+        .then((result) => {
+            return result.json()
+        })
+        .then((result) => {
+            const dispatch = thunkObject.dispatch;
+            dispatch(saveTopics(result))
+        })
+})
 
 const topicsSlice = createSlice({
     name: 'topicsSlice',

@@ -191,16 +191,16 @@ const commonsStartsState : ICommonsStarsState = {
 
 }
 
-// export const fetchCommonsStarts = createAsyncThunk('commonsStartsSlice/fetchCommonsStarts', (_, thunkObject) => {
-//     fetch('http://localhost:3001/themes')
-//         .then((result) => {
-//             return result.json()
-//         })
-//         .then((result) => {
-//             const dispatch = thunkObject.dispatch;
-//             dispatch(saveCommonsStarts(result.result))
-//         })
-// })
+export const fetchCommonsStarts = createAsyncThunk('commonsStartsSlice/fetchCommonsStarts', (_, thunkObject) => {
+    fetch('/api/rating-stats')
+        .then((result) => {
+            return result.json()
+        })
+        .then((result) => {
+            const dispatch = thunkObject.dispatch;
+            dispatch(saveCommonsStarts(result))
+        })
+})
 
 const commonsStartsSlice = createSlice({
     name: 'commonsStartsSlice',

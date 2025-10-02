@@ -1,9 +1,9 @@
-import { useState, type FC } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { Button, CardHeader, CardText, Form, Alert } from "react-bootstrap";
-import style from "./DashboardPage.module.css";
+import {  useEffect, useState, type FC } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { CardHeader, CardText, Button, Form, Alert, Spinner } from "react-bootstrap";
 import { LineChart } from "../../components/LineChart";
 import { PieChart } from "../../components/PieChart";
+import style from "./DashboardPage.module.css";
 
 interface ISentimentStatusState {
   year: number;
@@ -25,39 +25,51 @@ export const DashboardPage: FC = () => {
   const location = useLocation();
   const topic = location.state?.topic || "Тема не выбрана";
 
-  // 🔹 Основные данные
-  const [sentimentStatusState] = useState<ISentimentStatusState[]>([
-    { year: 2024, month: "Январь", monthNumber: 1, negative: 34, neutral: 4, positive: 8 },
-    { year: 2024, month: "Февраль", monthNumber: 2, negative: 33, neutral: 3, positive: 7 },
-    { year: 2024, month: "Март", monthNumber: 3, negative: 49, neutral: 4, positive: 8 },
-    { year: 2024, month: "Апрель", monthNumber: 4, negative: 52, neutral: 6, positive: 9 },
-    { year: 2024, month: "Май", monthNumber: 5, negative: 72, neutral: 2, positive: 8 },
-    { year: 2024, month: "Июнь", monthNumber: 6, negative: 93, neutral: 4, positive: 7 },
-    { year: 2024, month: "Июль", monthNumber: 7, negative: 104, neutral: 1, positive: 5 },
-    { year: 2024, month: "Август", monthNumber: 8, negative: 120, neutral: 1, positive: 8 },
-    { year: 2024, month: "Сентябрь", monthNumber: 9, negative: 131, neutral: 5, positive: 0 },
-    { year: 2024, month: "Октябрь", monthNumber: 10, negative: 139, neutral: 3, positive: 3 },
-    { year: 2024, month: "Ноябрь", monthNumber: 11, negative: 158, neutral: 4, positive: 7 },
-    { year: 2024, month: "Декабрь", monthNumber: 12, negative: 111, neutral: 3, positive: 2 },
-    { year: 2025, month: "Январь", monthNumber: 1, negative: 63, neutral: 1, positive: 2 },
-    { year: 2025, month: "Февраль", monthNumber: 2, negative: 58, neutral: 0, positive: 5 },
-    { year: 2025, month: "Март", monthNumber: 3, negative: 47, neutral: 1, positive: 0 },
-    { year: 2025, month: "Апрель", monthNumber: 4, negative: 24, neutral: 0, positive: 2 },
-    { year: 2025, month: "Май", monthNumber: 5, negative: 22, neutral: 0, positive: 7 },
-  ]);
-
-  const [sentimentTotalState] = useState<ISentimentTotal>({
+  // === Состояния ===
+  const [sentimentStatusState, setSentimentStatusState] = useState<ISentimentStatusState[]>([]);
+  const [sentimentTotalState, setSentimentTotalState] = useState<ISentimentTotal>({
     negative: 1310,
     neutral: 42,
     positive: 88,
   });
-
-  // 🔹 Состояние фильтра
+  const [filteredData, setFilteredData] = useState<ISentimentStatusState[]>([]);
   const [filter, setFilter] = useState({ from: "", to: "" });
-  const [filteredData, setFilteredData] = useState<ISentimentStatusState[]>(sentimentStatusState);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  // 🔹 Обработчик фильтрации
+  // === Загрузка данных при монтировании ===
+  useEffect(() => {
+    async function fetchData() {
+      setLoading(true);
+      try {
+        const [statsRes, totalRes] = await Promise.all([
+          fetch(`/api/sentiment-stats?theme=${encodeURIComponent(topic)}`),
+          fetch(`/api/sentiment-total?theme=${encodeURIComponent(topic)}`),
+        ]);
+
+        if (!statsRes.ok || !totalRes.ok) {
+          throw new Error("Ошибка при загрузке данных");
+        }
+
+        const statsData = await statsRes.json();
+        const totalData = await totalRes.json();
+
+        setSentimentStatusState(statsData);
+        setFilteredData(statsData); // по умолчанию показываем все данные
+        setSentimentTotalState(totalData);
+        setError(null);
+      } catch (err) {
+        console.error("Ошибка API:", err);
+        setError("Не удалось загрузить данные. Попробуйте позже.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchData();
+  }, [topic]);
+
+  // === Фильтрация данных ===
   function handleFilter(e: React.FormEvent) {
     e.preventDefault();
 
@@ -88,16 +100,19 @@ export const DashboardPage: FC = () => {
     }
   }
 
+  // === JSX ===
   return (
     <div className={style.container}>
       <CardHeader as="h2" className={style.title}>
         {topic}
       </CardHeader>
 
-      {/* ===== LineChart + фильтр ===== */}
+      {/* ===== Секция с LineChart и фильтром ===== */}
       <section className={style.section}>
         <div className={style.chartBox}>
-          {error ? (
+          {loading ? (
+            <Spinner animation="border" />
+          ) : error && filteredData.length === 0 ? (
             <Alert variant="danger" className={style.alert}>
               {error}
             </Alert>
@@ -131,17 +146,26 @@ export const DashboardPage: FC = () => {
             </Button>
           </Form>
 
-          <CardText>
-            Этот график показывает зависимость тональностей отзывов от времени за выбранный период.
-          </CardText>
+          {error && filteredData.length > 0 ? (
+            <Alert variant="warning">{error}</Alert>
+          ) : (
+            <CardText>
+              Этот график показывает зависимость тональностей отзывов от времени за выбранный период.
+            </CardText>
+          )}
         </div>
       </section>
 
-      {/* ===== PieChart ===== */}
+      {/* ===== Секция с PieChart ===== */}
       <section className={style.section}>
         <div className={`${style.chartBox} ${style.chartBox__pieChart}`}>
-          <PieChart sentimentTotal={sentimentTotalState} />
+          {loading ? (
+            <Spinner animation="border" />
+          ) : (
+            <PieChart sentimentTotal={sentimentTotalState} />
+          )}
         </div>
+
         <div className={style.infoBox}>
           <CardText>
             Эта круговая диаграмма показывает соотношение тональностей по теме за всё время.
@@ -149,6 +173,7 @@ export const DashboardPage: FC = () => {
         </div>
       </section>
 
+      {/* ===== Кнопка возврата ===== */}
       <Button className={style.backButton} onClick={() => navigate("/topics")}>
         Вернуться назад
       </Button>

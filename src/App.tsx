@@ -4,17 +4,19 @@ import { DashboardPage } from './pages/DashboardPage/DashboardPage'
 import { HomePage } from './pages/HomePage/HomePage'
 import { CommonPage } from './pages/CommonPage/CommonPage'
 import { TopicsPage } from './pages/TopicsPage/TopicsPage'
-//import { useAppDispatch } from "../../store";
-//import { fetchTopics } from "../../store/topicsSlice";
+import { useEffect } from 'react'
+import { useAppDispatch } from './store'
+import { fetchTopics } from './store/topicsSlice'
+import { fetchCommonsStarts } from './store/commonStartsSlice'
 
 function App() {
 
-  // const dispatch = useAppDispatch()
+  const dispatch = useAppDispatch()
 
-    // useEffect(() => {
-    //     dispatch(fetchTopics())
-    //     dispatch(saveTopics())
-    // }, [])
+    useEffect(() => {
+        dispatch(fetchTopics())
+        dispatch(fetchCommonsStarts())
+    }, [])
 
 
   return (
