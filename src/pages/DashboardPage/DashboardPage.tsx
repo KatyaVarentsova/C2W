@@ -44,7 +44,7 @@ export const DashboardPage: FC = () => {
 
       {/* Первая секция — PieChart и описание */}
       <section className={style.section}>
-        <div className={style.chartBox}>
+        <div className={`${style.chartBox} ${style.chartBox__pieChart}`}>
           <PieChart />
         </div>
         <div className={style.infoBox}>

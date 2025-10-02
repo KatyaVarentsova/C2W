@@ -41,20 +41,20 @@ export const data = {
     {
       label: 'Положительно',
       data: [2, 4, 5, 3, 2, 5, 5],
-      borderColor: 'rgb(255, 99, 132)',
-      backgroundColor: 'rgba(255, 99, 132, 0.5)',
+      borderColor: '#8DAAFF',
+      backgroundColor: '#8DAAFF',
     },
     {
       label: 'Нейтрально',
       data: [2, 4, 5, 3, 6, 2, 6],
-      borderColor: 'rgb(53, 162, 235)',
-      backgroundColor: 'rgba(53, 162, 235, 0.5)',
+      borderColor: '#FFDC89',
+      backgroundColor: '#FFDC89',
     },
     {
       label: 'Отрицательно',
       data: [4, 3, 2, 6, 3, 6, 2],
-      borderColor: 'rgb(255, 206, 86)',
-      backgroundColor: 'rgb(255, 206, 86)',
+      borderColor: '#FF8C8C',
+      backgroundColor: '#FF8C8C',
     }
   ],
 };

@@ -47,27 +47,27 @@ export function BarChart() {
       {
         label: '1 звезда',
         data: [10, 8, 3, 5, 6, 2, 6],
-        backgroundColor: '#79AFFE',
+        backgroundColor: '#EE5555',
       },
       {
         label: '2 звезды',
         data: [5, 3, 6, 1, 4, 6, 2],
-        backgroundColor: '#4992FE',
+        backgroundColor: '#EB8E4B',
       },
       {
         label: '3 звезды',
         data: [3, 5, 6, 2, 1, 4, 2],
-        backgroundColor: '#0D6EFD',
+        backgroundColor: '#EEC159',
       },
       {
         label: '4 звезды',
         data: [1, 2, 1, 2, 1, 3, 2],
-        backgroundColor: '#376DBE',
+        backgroundColor: '#4FBFEF',
       },
       {
         label: '5 звёзд',
         data: [4, 2, 6, 5, 2, 4, 2],
-        backgroundColor: '#0445A4',
+        backgroundColor: '#4068E4',
       }
     ],
   };
