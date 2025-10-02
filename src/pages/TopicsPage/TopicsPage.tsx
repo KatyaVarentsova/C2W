@@ -2,29 +2,17 @@ import type { FC } from "react";
 import { Button, CardHeader } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import style from "./TopicsPage.module.css"
+import { useAppSelector } from "../../store";
+import { topicsSelector } from "../../store/topicsSlice";
 
 export const TopicsPage: FC = () => {
-  const topics = [
-    "Акции и бонусные программы / Кэшбэк",
-    "Банкоматы и терминалы",
-    "Вклады и депозиты",
-    "Дебетовые карты",
-    "Интернет банкинг",
-    "Кредитные карты",
-    "Кредиты и займы",
-    "Мобильное приложение",
-    "Навязывание услуг",
-    "Обслуживание в офисах",
-    "Переводы и платежи",
-    "Тарифы и комиссии",
-    "Техническая поддержка",
-  ];
+  const topics = useAppSelector(topicsSelector)
 
   const navigate = useNavigate();
 
   const handleClick = (topic: string) => {
     console.log("Выбрана тема:", topic);
-    navigate("/dashboard");
+    navigate("/dashboard", { state: { topic } });
   };
 
   return (
@@ -36,12 +24,12 @@ export const TopicsPage: FC = () => {
       <div className={style.topicsPage__grid}>
         {topics.map((item) => (
           <Button
-            key={item}
-            onClick={() => handleClick(item)}
+            key={item.idCategory}
+            onClick={() => handleClick(item.themeCategory)}
             variant="outline-primary"
             className={style.topicsPage__button}
           >
-            {item}
+            {item.themeCategory}
           </Button>
         ))}
       </div>
